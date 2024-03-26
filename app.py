@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 import random
 import wikipedia
-import subprocess
 
 app = Flask(__name__)
 
@@ -25,22 +24,21 @@ def generate_place_fact(place_name):
 def get_student_number():
     return jsonify({"student_number": "200538095"})
 
+# @app.route('/get-fact/<place_name>', methods=['GET'])
+# def get_fact(place_name):
+#     place_name = place_name.split()[-1]
+#     fact = generate_place_fact(place_name)
+#     fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+#     return jsonify({"fulfillmentText": fact})
+
 @app.route('/webhook', methods=['POST'])
-def webhook():
-    req = request.get_json()
-    query_text = req.get('queryResult').get('queryText')
+def get_fact(place_name):
+    place_name = place_name.split()[-1]
+    fact = generate_place_fact(place_name)
+    fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+    # return jsonify({"fulfillmentText": fulfillmentText})
 
-    # Extract the place name from the query text
-    place_name = query_text.split('about')[-1].strip()
-
-    # Run the script with subprocess and get the output
-    process = subprocess.Popen(['python', 'app.py', place_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-
-    # Return the output as the fulfillment text
-    fulfillmentText = stdout.decode("utf-8")
-    
-    return jsonify({"fulfillmentText": fulfillmentText})
+    return jsonify({"fulfillmentText": fact})
 
 if __name__ == '__main__':
     app.run(debug=True)
