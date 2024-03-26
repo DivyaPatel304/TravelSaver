@@ -48,7 +48,7 @@ def generate_place_fact(place_name):
 
 @app.route('/', methods=['GET'])
 def get_student_number():
-    return jsonify({"student_number": "200537749"})
+    return jsonify({"student_number": "200538095"})
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
