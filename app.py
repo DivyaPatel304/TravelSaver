@@ -55,8 +55,8 @@ def webhook():
     req = request.get_json(silent=True, force=True)
     fulfillmentText = ''
     query_result = req.get('queryResult')
-    if query_result.get('action') == 'input.places':
-        place_name = query_result.get('parameters').get('place_name')
+    if query_result.get('action') == 'input.location':
+        place_name = query_result.get('parameters').get('location').get('geo-country')
         fact = generate_place_fact(place_name)
         fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
 
