@@ -39,7 +39,7 @@ def webhook():
 
     # Extract the location name from the query text
     if "I want to know about" in query_text:
-        place_name = place_name.split()[-1]
+        place_name = query_text.split()[-1]
     else:
         place_name = query_text
 
