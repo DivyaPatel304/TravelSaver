@@ -34,7 +34,7 @@ def webhook():
     place_name = query_text.split('about')[-1].strip()
 
     # Run the script with subprocess and get the output
-    process = subprocess.Popen(['python', 'fetch_facts.py', place_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(['python', 'app.py', place_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
     # Return the output as the fulfillment text
