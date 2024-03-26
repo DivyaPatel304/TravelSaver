@@ -24,21 +24,29 @@ def generate_place_fact(place_name):
 def get_student_number():
     return jsonify({"student_number": "200538095"})
 
-# @app.route('/get-fact/<place_name>', methods=['GET'])
-# def get_fact(place_name):
-#     place_name = place_name.split()[-1]
-#     fact = generate_place_fact(place_name)
-#     fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
-#     return jsonify({"fulfillmentText": fact})
-
-@app.route('/webhook', methods=['POST'])
+@app.route('/get-fact/<place_name>', methods=['GET'])
 def get_fact(place_name):
     place_name = place_name.split()[-1]
     fact = generate_place_fact(place_name)
     fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
-    # return jsonify({"fulfillmentText": fulfillmentText})
+    return jsonify({"fulfillmentText": fulfillmentText})
 
-    return jsonify({"fulfillmentText": fact})
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    req = request.get_json(silent=True, force=True)
+    fulfillmentText = ''
+    query_text = req.get('queryResult').get('queryText')
+
+    # Extract the location name from the query text
+    if "I want to know about" in query_text:
+        place_name = place_name.split()[-1]
+    else:
+        place_name = query_text
+
+    fact = generate_place_fact(place_name)
+    fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+
+    return jsonify({"fulfillmentText": fulfillmentText})
 
 if __name__ == '__main__':
     app.run(debug=True)
