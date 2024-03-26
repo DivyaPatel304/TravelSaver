@@ -60,7 +60,7 @@ def webhook():
         fact = generate_place_fact(place_name)
         fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
 
-    return jsonify({"fulfillmentText": fulfillmentText})
+    return jsonify({"fulfillmentText": place_name})
 
 if __name__ == '__main__':
     app.run(debug=True)
