@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import random
-from nltk.tokenize import word_tokenize
 import wikipedia
+import subprocess
 
 app = Flask(__name__)
 
@@ -27,16 +27,19 @@ def get_student_number():
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    req = request.get_json(silent=True, force=True)
-    fulfillmentText = ''
+    req = request.get_json()
     query_text = req.get('queryResult').get('queryText')
 
-    # Extract the location name from the query text
-    place_name = query_text.split('to')[-1].strip()
+    # Extract the place name from the query text
+    place_name = query_text.split('about')[-1].strip()
 
-    fact = generate_place_fact(place_name)
-    fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+    # Run the script with subprocess and get the output
+    process = subprocess.Popen(['python', 'fetch_facts.py', place_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
+    # Return the output as the fulfillment text
+    fulfillmentText = stdout.decode("utf-8")
+    
     return jsonify({"fulfillmentText": fulfillmentText})
 
 if __name__ == '__main__':
