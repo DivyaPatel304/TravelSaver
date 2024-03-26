@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 import random
 from nltk.corpus import wordnet
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 import wikipedia
 import nltk
+import re
 
 nltk.download('wordnet')
 nltk.download('stopwords')
@@ -20,6 +20,16 @@ def get_synonyms(word):
             synonyms.append(lemma.name())
     return synonyms
 
+def preprocess_text(text):
+    stop_words = set(stopwords.words('english'))
+    # Remove special characters and numbers
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # Tokenize the text
+    words = word_tokenize(text)
+    # Remove stopwords
+    filtered_words = [w.lower() for w in words if w.lower() not in stop_words]
+    return filtered_words
+
 def generate_place_fact(place_name):
     try:
         # Get the Wikipedia page for the place
@@ -28,16 +38,23 @@ def generate_place_fact(place_name):
         # Tokenize the content into sentences
         sentences = sent_tokenize(page.content)
 
-        # Remove stopwords from the sentences
-        stop_words = set(stopwords.words('english'))
-        filtered_sentences = []
-        for sentence in sentences:
-            word_tokens = word_tokenize(sentence)
-            filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words]
-            filtered_sentences.append(' '.join(filtered_sentence))
+        # Preprocess the sentences
+        preprocessed_sentences = [preprocess_text(sentence) for sentence in sentences]
 
-        # Select a random fact
-        fact = random.choice(filtered_sentences)
+        # Flatten the list of sentences into a list of words
+        all_words = [word for sentence in preprocessed_sentences for word in sentence]
+
+        # Select a random word from the processed text
+        random_word = random.choice(all_words)
+
+        # Get synonyms for the random word
+        synonyms = get_synonyms(random_word)
+
+        # Select a random synonym
+        random_synonym = random.choice(synonyms)
+
+        # Generate a fact using the random synonym
+        fact = f"{random_synonym.capitalize()} is a synonym of {random_word.capitalize()}."
 
         return fact
 
@@ -65,10 +82,7 @@ def webhook():
     fact = generate_place_fact(place_name)
     fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
 
-    return jsonify({"fulfillmentText": fact})
-
-
-    return jsonify({"fulfillmentText": fact})
+    return jsonify({"fulfillmentText": fulfillmentText})
 
 if __name__ == '__main__':
     app.run(debug=True)
