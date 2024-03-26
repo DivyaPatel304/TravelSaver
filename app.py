@@ -54,11 +54,19 @@ def get_student_number():
 def webhook():
     req = request.get_json(silent=True, force=True)
     fulfillmentText = ''
-    query_result = req.get('queryResult')
-    if query_result.get('action') == 'input.location':
-        place_name = query_result.get('queryText')
-        fact = generate_place_fact(place_name)
-        fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+    query_text = req.get('queryResult').get('queryText')
+
+    # Extract the location name from the query text
+    if 'to' in query_text:
+        place_name = query_text.split('to')[1].strip()
+    else:
+        place_name = query_text
+
+    fact = generate_place_fact(place_name)
+    fulfillmentText = f"Here's an interesting fact about {place_name}: {fact}"
+
+    return jsonify({"fulfillmentText": fact})
+
 
     return jsonify({"fulfillmentText": fact})
 
