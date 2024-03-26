@@ -38,7 +38,7 @@ def webhook():
     query_text = req.get('queryResult').get('queryText')
 
     # Extract the location name from the query text
-    if "I want to know about" in query_text:
+    if "I" in query_text:
         place_name = query_text.split()[-1]
     else:
         place_name = query_text
